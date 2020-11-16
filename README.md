@@ -12,4 +12,4 @@ Navigate to the `github-visualiser` folder and run the following terminal comman
 docker build -t <your_image_name_here> .
 docker run -it -p 8080:8080 --rm <your_image_name>
 ```
-The docker container is now running and the project should be accessible on localhost:8080.
+The docker container is now running and the project should be accessible on `localhost:8080`.
