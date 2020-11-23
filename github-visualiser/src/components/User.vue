@@ -3,6 +3,7 @@
   <v-container v-else-if="display">
     <v-card
         elevation="2"
+        style="padding: 3rem"
     >
       <v-card-title
           class="justify-center"
