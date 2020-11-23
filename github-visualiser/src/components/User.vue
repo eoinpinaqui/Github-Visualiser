@@ -1,5 +1,6 @@
 <template>
-  <v-container>
+  <Unknown v-if="!display" :search="toSearch" category="Users"></Unknown>
+  <v-container v-else-if="display">
     <v-card
         elevation="2"
     >
@@ -53,10 +54,11 @@
         <v-row style="margin: 1em">
           <v-col>
             <h3>Programming Languages (measured in bytes written):</h3>
-            <pie-chart :data="languages"></pie-chart>
+            <pie-chart :data="languages" :donut="true"></pie-chart>
           </v-col>
           <v-col>
-            <p>This is it isnt it.</p>
+            <h3>Commit History:</h3>
+            <line-chart :data="{'2017-05-13': 2, '2017-05-14': 5}"></line-chart>
           </v-col>
         </v-row>
       </v-container>
@@ -66,9 +68,14 @@
 
 <script>
 import axios from "axios";
+import Unknown from "./Unknown";
 
 export default {
   name: 'User',
+
+  components: {
+    Unknown
+  },
 
   data: () => ({
     display: false,
@@ -89,16 +96,24 @@ export default {
 
   props: {
     toSearch: String,
+    token: String,
   },
 
   methods: {
     search() {
-      this.display = false;
+      this.display = true;
       let baseURL = "https://api.github.com";
       let usernameString = this.toSearch;
       let urlToQuery = baseURL + "/users/" + usernameString;
+
+      // Fetch general data about user from the Github API
       axios
-          .get(urlToQuery)
+          .get(urlToQuery, {
+            headers: {
+              authorization: "token " + this.token
+            },
+            timeout: 1000
+          })
           .then(response => {
             this.userData = response;
             this.username = this.userData.data.login;
@@ -110,7 +125,12 @@ export default {
 
             let reposURL = this.userData.data.repos_url;
             axios
-                .get(reposURL)
+                .get(reposURL, {
+                  headers: {
+                    authorization: "token " + this.token
+                  },
+                  timeout: 1000
+                })
                 .then(response => {
                   this.repos = response.data.length;
                   let languages = new Map();
@@ -118,7 +138,12 @@ export default {
                     let repoName = response.data[i].name;
                     const languagesURL = baseURL + "/repos/" + usernameString + "/" + repoName + "/languages";
                     axios
-                        .get(languagesURL)
+                        .get(languagesURL, {
+                          headers: {
+                            authorization: "token" + this.token
+                          },
+                          timeout: 1000
+                        })
                         .then(response => {
                           for (const [key, value] of Object.entries(response.data)) {
                             if(key !== undefined && key !== "undefined"){
@@ -131,22 +156,37 @@ export default {
                               this.languages.push([key, value]);
                             }
                           }
-                          console.log(this.languages);
                         })
+                        .catch(error => {
+                          console.log(error);
+                          this.display = false;
+                        });
                   }
                 })
+                .catch(error => {
+                  console.log(error);
+                  this.display = false;
+                });
           })
-          .catch(error => alert(error));
-
+          .catch(error => {
+            console.log(error);
+            this.display = false;
+          });
     }
   },
 
   created() {
     this.search();
   },
+
   watch: {
     toSearch: function () {
       this.search();
+    },
+    display: function() {
+      if(!this.display) {
+        console.log("Not found")
+      }
     }
   }
 }

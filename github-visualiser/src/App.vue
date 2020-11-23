@@ -1,6 +1,10 @@
 <template>
   <v-app>
-
+    <v-container>
+      <h1
+        style="text-align: center; font-size: 3.5em"
+      > Github Visualiser</h1>
+    </v-container>
     <v-container>
       <v-row>
         <v-col>
@@ -28,7 +32,7 @@
     </v-container>
 
     <v-main>
-      <User v-if="displayUser" v-bind:toSearch="search" />
+      <User v-if="displayUser" :toSearch="search" token="9b6a46190d38d61f8af4871f41a7df0a9627c73f" />
     </v-main>
   </v-app>
 </template>
