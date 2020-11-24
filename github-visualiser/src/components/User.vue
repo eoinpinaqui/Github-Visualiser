@@ -54,12 +54,16 @@
       <v-container>
         <v-row style="margin: 1em">
           <v-col>
-            <h3>Programming Languages (measured in bytes written):</h3>
+            <h3>Languages in owned repositories (measured in bytes):</h3>
             <pie-chart :data="languages" :donut="true"></pie-chart>
           </v-col>
           <v-col>
             <h3>Commit History:</h3>
             <line-chart :data="{'2017-05-13': 2, '2017-05-14': 5}"></line-chart>
+          </v-col>
+          <v-col>
+            <h3>Recent Commits</h3>
+            <column-chart :data="recentActivity"></column-chart>
           </v-col>
         </v-row>
       </v-container>
@@ -92,7 +96,8 @@ export default {
     repos: "",
     repoData: "",
     languages: "",
-
+    commitData: "",
+    recentActivity: "",
   }),
 
   props: {
@@ -113,7 +118,7 @@ export default {
             headers: {
               authorization: "token " + this.token
             },
-            timeout: 1000
+            timeout: 10000
           })
           .then(response => {
             this.userData = response;
@@ -124,31 +129,85 @@ export default {
             this.followers = this.userData.data.followers;
             this.following = this.userData.data.following;
 
+            const eventURL = baseURL + "/users/" + usernameString + "/events/public";
+            axios
+                .get(eventURL)
+                .then(response => {
+                  this.commitData = response.data;
+                  let commitsMap = new Map();
+                  for(let i = 0; i < response.data.length; i++) {
+                    let event = response.data[i];
+                    if(event.type === "PushEvent") {
+                      let commits = event.payload.commits;
+                      for(let j = 0; j < commits.length; j++) {
+                        if(commits[j].author.name === this.fullName) {
+                          if(commitsMap.has(event.repo.name)) {
+                            let num = commitsMap.get(event.repo.name);
+                            commitsMap.set(event.repo.name, num + 1);
+                          } else {
+                            commitsMap.set(event.repo.name, 1);
+                          }
+                        }
+                      }
+                    }
+                  }
+                  this.recentActivity = [];
+                  for (const [key, value] of commitsMap) {
+                    this.recentActivity.push([key, value]);
+                  }
+                })
+
             let reposURL = this.userData.data.repos_url;
             axios
                 .get(reposURL, {
                   headers: {
                     authorization: "token " + this.token
                   },
-                  timeout: 1000
+                  timeout: 10000
                 })
                 .then(response => {
                   this.repos = response.data.length;
+
                   let languages = new Map();
+                  let repoCommits = new Map();
                   for (let i = 0; i < response.data.length; i++) {
                     let repoName = response.data[i].name;
+                    const commitsURL = baseURL + "/repos/" + usernameString + "/" + repoName + "/stats/contributors";
+                    axios
+                        .get(commitsURL)
+                        .then(response => {
+                          let commitStats = response.data;
+                          for(let j = 0; j < commitStats.length; j++) {
+                            let contributors = commitStats[i];
+                            for(let k = 0; k < contributors.length; k++) {
+                              let contributor = contributors[k];
+                              if(contributor.author.login === usernameString) {
+                                repoCommits.set(repoName, contributor.total);
+                              }
+                            }
+                          }
+                          console.log(response.data);
+                        })
+
+
+
                     const languagesURL = baseURL + "/repos/" + usernameString + "/" + repoName + "/languages";
                     axios
                         .get(languagesURL, {
                           headers: {
                             authorization: "token" + this.token
                           },
-                          timeout: 1000
+                          timeout: 10000
                         })
                         .then(response => {
                           for (const [key, value] of Object.entries(response.data)) {
-                            if(key !== undefined && key !== "undefined"){
-                              languages.set(key, value);
+                            if (key !== undefined && key !== "undefined") {
+                              if(languages.has(key)) {
+                                let num = languages.get(key);
+                                languages.set(key, num + value);
+                              } else {
+                                languages.set(key, value);
+                              }
                             }
                           }
                           this.languages = [];
@@ -162,6 +221,7 @@ export default {
                           console.log(error);
                           this.display = false;
                         });
+
                   }
                 })
                 .catch(error => {
@@ -184,8 +244,8 @@ export default {
     toSearch: function () {
       this.search();
     },
-    display: function() {
-      if(!this.display) {
+    display: function () {
+      if (!this.display) {
         console.log("Not found")
       }
     }

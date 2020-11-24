@@ -32,7 +32,7 @@
     </v-container>
 
     <v-main>
-      <User v-if="displayUser" :toSearch="search" token="9b6a46190d38d61f8af4871f41a7df0a9627c73f" />
+      <User v-if="displayUser" :toSearch="search" token="a8a7b1da845f6bc743b3f36d94ff8a754942d451" />
     </v-main>
   </v-app>
 </template>
@@ -54,12 +54,18 @@ export default {
     search: "",
     dropdown: ["Users", "Repositories", "Organisations"],
     dropdownSelected: "",
+    token: "",
 
     // booleans for conditional rendering
     displayUser: false,
     displayRepo: false,
     displayOrg: false,
   }),
+
+  created() {
+    this.token = process.env.GITHUB_TOKEN;
+    console.log(process.env.GITHUB_TOKEN);
+  },
 
   methods: {
     getData: function() {
