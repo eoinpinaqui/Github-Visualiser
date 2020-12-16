@@ -7,7 +7,7 @@
       <v-card-title
           class="justify-center"
           style="font-size: 2rem; padding: 1em"
-      >I'm sorry, we couldn't find "{{search}}" in "{{category}}"
+      >I'm sorry, we couldn't find "{{ search }}" in "{{ category }}"
       </v-card-title>
       <v-img
           max-width="300px"
