@@ -48,7 +48,7 @@ export default {
     /* Extracted repo data */
     repoName: "",
     repoDescription: "",
-    commitData: ""
+    commitData: []
   }),
 
   props: {
@@ -79,6 +79,7 @@ export default {
     getRepoInfo() {
       let baseURL = "https://api.github.com";
       let repo = this.toSearch;
+      this.commitData = [];
       const urlToQuery = baseURL + "/repos/" + repo;
       axios
           .get(urlToQuery, {
@@ -92,7 +93,9 @@ export default {
             this.repoData = response.data;
             this.repoName = this.repoData.name;
             this.repoDescription = this.repoData.description;
-            this.getCommitInfo(this.repoData.commits_url);
+
+            let urlToQuery = this.repoData.commits_url.substring(0, this.repoData.commits_url.length - 6);
+            this.getNextPageOfCommits(urlToQuery, 1, 100);
           })
           .catch(error => {
             this.display = false;
@@ -113,7 +116,7 @@ export default {
             this.commitData = response.data;
             if(this.commitData.length > 0) {
               console.log("Page 1: " + this.commitData.length);
-              this.getNextPage(urlToQuery, 2);
+              this.getNextPageOfCommits(urlToQuery, 1, 100);
             }
           })
           .catch(error => {
@@ -122,8 +125,8 @@ export default {
           })
     },
 
-    getNextPage(commitURL, page) {
-      let urlToQuery = commitURL + "?page=" + page;
+    getNextPageOfCommits(commitURL, page, perPage) {
+      let urlToQuery = commitURL + "?page=" + page + "&per_page=" + perPage;
       axios
           .get(urlToQuery, {
             headers: {
@@ -136,9 +139,9 @@ export default {
             if(moreCommits.length > 0) {
               console.log("Page " + page + ": " + moreCommits.length);
               this.commitData = this.commitData.concat(moreCommits);
-              this.getNextPage(commitURL, page + 1);
+              this.getNextPageOfCommits(commitURL, page + 1, perPage);
             } else {
-              console.log("Length: " +this.commitData.length);
+              console.log("Length: " + this.commitData.length);
             }
           })
           .catch(error => {
