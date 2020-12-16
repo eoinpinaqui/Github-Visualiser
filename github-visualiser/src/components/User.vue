@@ -109,6 +109,22 @@ export default {
     token: String,
   },
 
+
+  created() {
+    this.search();
+  },
+
+  watch: {
+    toSearch: function () {
+      this.search();
+    },
+    display: function () {
+      if (!this.display) {
+        console.log("Not found")
+      }
+    }
+  },
+
   methods: {
     search() {
       this.getUserData();
@@ -127,11 +143,13 @@ export default {
             timeout: 10000
           })
           .then(response => {
+            this.display = true;
             this.userData = response;
             this.extractUserInfo();
             this.getRepoData();
           })
           .catch(error => {
+            this.display = false;
             alert(error);
           })
     },
@@ -158,7 +176,6 @@ export default {
             timeout: 10000
           })
           .then(response => {
-            this.display = true;
             let commitsMap = new Map();
             for (let i = 0; i < response.data.length; i++) {
               let event = response.data[i];
@@ -203,6 +220,7 @@ export default {
             setTimeout(this.extractRepoCommits, 2000);
           })
           .catch(error => {
+            this.display = false;
             alert(error);
           })
     },
@@ -237,6 +255,7 @@ export default {
               }
             })
             .catch(error => {
+              this.display = false;
               alert(error);
             })
       }
@@ -274,24 +293,9 @@ export default {
               }
             })
             .catch(error => {
+              this.display = false;
               alert(error);
             })
-      }
-    }
-  },
-
-
-  created() {
-    this.search();
-  },
-
-  watch: {
-    toSearch: function () {
-      this.search();
-    },
-    display: function () {
-      if (!this.display) {
-        console.log("Not found")
       }
     }
   }
