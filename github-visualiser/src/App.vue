@@ -33,8 +33,8 @@
     </v-container>
 
     <v-main>
-      <User v-if="displayUser" :toSearch="search" token="1fb59a1ace29be43435a7ca9429721f132d13f87"/>
-      <Repo v-else-if="displayRepo" :toSearch="search" token="1fb59a1ace29be43435a7ca9429721f132d13f87" />
+      <User v-if="displayUser" :toSearch="search" :token="access_token"/>
+      <Repo v-else-if="displayRepo" :toSearch="search" :token="access_token"/>
     </v-main>
   </v-app>
 </template>
@@ -59,6 +59,7 @@ export default {
     dropdown: ["Users", "Repositories", "Organisations"],
     dropdownSelected: "",
     token: "",
+    access_token: process.env.VUE_APP_API_KEY,
 
     // booleans for conditional rendering
     displayUser: false,
@@ -67,8 +68,7 @@ export default {
   }),
 
   created() {
-    this.token = process.env.GITHUB_TOKEN;
-    console.log(process.env.GITHUB_TOKEN);
+    this.access_token = process.env.VUE_APP_API_KEY;
   },
 
   methods: {
