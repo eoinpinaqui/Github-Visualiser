@@ -29,12 +29,18 @@
               </div>
             </v-card>
           </v-col>
+          <v-col>
+
+          </v-col>
+          <v-col>
+
+          </v-col>
         </v-row>
         <v-row
 
         >
           <v-col>
-            <h3>Commits by Top 50 Contributors over time:</h3>
+            <h3>Commits by user over time:</h3>
             <line-chart :data="chartData"></line-chart>
           </v-col>
         </v-row>
@@ -96,11 +102,13 @@ export default {
 
     getRepoInfo() {
       this.getContributors();
+      this.getCommitInfo();
+    },
 
+    getCommitInfo() {
       let baseURL = "https://api.github.com";
       let repo = this.toSearch;
-      this.commitData = [];
-      const urlToQuery = baseURL + "/repos/" + repo;
+      const urlToQuery = baseURL + "/repos/" + repo + "/stats/contributors";
       axios
           .get(urlToQuery, {
             headers: {
@@ -109,102 +117,31 @@ export default {
             timeout: 10000
           })
           .then(response => {
-            this.display = true;
-            this.repoData = response.data;
-            this.repoName = this.repoData.name;
-            this.repoDescription = this.repoData.description;
+            let contributorsInfo = response.data;
+            contributorsInfo.reverse();
 
-            let urlToQuery = this.repoData.commits_url.substring(0, this.repoData.commits_url.length - 6);
-            this.cancel = false;
-            this.getNextPageOfCommits(urlToQuery, 1, 100);
-            setTimeout('this.contributors.sort((a, b) => (a.num > b.num) ? 1 : ((b. num > a.num) ? -1 : 0))', 1000);
+            this.chartData = [];
+            for(let i = 0; i < contributorsInfo.length; i++) {
+              let x = contributorsInfo[i];
+              let name = x.author.login;
+              let weeks = x.weeks;
+              let data = {};
+              for(let j = 0; j < weeks.length; j++) {
+                let week = weeks[j];
+                if(week.c > 0) {
+                  let dateObject = new Date(week.w * 1000);
+                  let dateFormat = dateObject.toISOString();
+                  let date = dateFormat.substring(0, 10);
+                  data[date] = week.c;
+                }
+              }
+              this.chartData.push({name, data});
+            }
           })
           .catch(error => {
             this.display = false;
             alert(error);
           })
-    },
-
-    getNextPageOfCommits(commitURL, page, perPage) {
-      if (this.cancel === true) {
-        console.log("CANCELLING");
-        this.cancel = false;
-      } else {
-        let urlToQuery = commitURL + "?page=" + page + "&per_page=" + perPage;
-        axios
-            .get(urlToQuery, {
-              headers: {
-                authorization: "token " + this.token
-              },
-              timeout: 10000
-            })
-            .then(response => {
-              let moreCommits = response.data;
-              if (moreCommits.length > 0) {
-                this.commitData = this.commitData.concat(moreCommits);
-                if (page % 10 === 0 || page === 1) {
-                  console.log("Page " + page + ": UPDATING CHART");
-                  this.extractChartData()
-                }
-                this.getNextPageOfCommits(commitURL, page + 1, perPage);
-              } else {
-                this.extractChartData()
-              }
-            })
-            .catch(error => {
-              this.display = false;
-              alert(error);
-            })
-      }
-    },
-
-    extractChartData() {
-      let commitInfo = [];
-      for (let i = 0; i < this.commitData.length; i++) {
-        let commiti = this.commitData[i];
-        let name = commiti.commit.author.name;
-        let date = commiti.commit.author.date;
-        commitInfo.push({name, date});
-      }
-
-      let userMap = new Map();
-      for (let i = 0; i < commitInfo.length; i++) {
-        let user = commitInfo[i].name;
-        let date = commitInfo[i].date;
-        if (userMap.has(user)) {
-          let commitDates = userMap.get(user);
-          commitDates.push(date);
-          userMap.set(user, commitDates);
-        } else {
-          userMap.set(user, []);
-          let commitDates = userMap.get(user);
-          commitDates.push(date);
-          userMap.set(user, commitDates);
-        }
-      }
-
-      let chart = [];
-
-      for (const [name, dates] of userMap) {
-        let dateMap = new Map();
-        for (let i = 0; i < dates.length; i++) {
-          let commitDate = dates[i];
-          commitDate = commitDate.substring(0, 10);
-          if (dateMap.has(commitDate)) {
-            let numCommits = dateMap.get(commitDate);
-            dateMap.set(commitDate, numCommits + 1);
-          } else {
-            dateMap.set(commitDate, 1);
-          }
-        }
-
-        let data = {};
-        for (const [date, num] of dateMap) {
-          data[date] = num;
-        }
-        chart.push({name, data})
-      }
-      this.chartData = chart.slice(0, 50);
     },
 
     getContributors() {
@@ -220,9 +157,8 @@ export default {
           })
           .then(response => {
             let contribs = response.data;
-            console.log(contribs);
             this.contributors = [];
-            for (let i = 0; i < contribs.length && i < 10; i++) {
+            for (let i = 0; i < contribs.length && i < 5; i++) {
               let x = contribs[i];
               this.getUserImage(x.url, x.login, x.contributions);
               this.numContributors = i + 1;
