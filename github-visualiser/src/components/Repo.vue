@@ -16,15 +16,22 @@
         >{{ repoDescription }}
         </v-card-text>
         <v-row
-
         >
+          <v-col>
+            <h3>Top {{numContributors}} Contributors:</h3>
+            <v-card v-for="(user, index) in contributors" :key="user">
+              <p> {{user}}  {{index + 1}}</p>
+            </v-card>
+          </v-col>
           <p>{{contributors}}</p>
         </v-row>
         <v-row
 
         >
-          <h3>Commits by Top 50 Contributors over time:</h3>
-          <line-chart :data="chartData"></line-chart>
+          <v-col>
+            <h3>Commits by Top 50 Contributors over time:</h3>
+            <line-chart :data="chartData"></line-chart>
+          </v-col>
         </v-row>
       </v-card>
     </v-container>
@@ -52,7 +59,8 @@ export default {
     commitData: [],
     chartData: [],
     cancel: false,
-    contributors: []
+    contributors: [],
+    numContributors: 0,
   }),
 
   props: {
@@ -210,11 +218,8 @@ export default {
             this.contributors = [];
             for(let i = 0; i < contribs.length && i < 10; i++) {
               let x = contribs[i];
-              let image = this.getUserImage(x.url);
-              console.log("Image to show: " + image);
-              let login = x.login;
-              let num = x.contributions;
-              this.contributors.push({login, num, image});
+              this.getUserImage(x.url, x.login, x.contributions);
+              this.numContributors = i + 1;
             }
           })
           .catch(error => {
@@ -223,7 +228,7 @@ export default {
           })
     },
 
-    getUserImage(urlToQuery) {
+    getUserImage(urlToQuery, login, num) {
       axios
           .get(urlToQuery, {
             headers: {
@@ -232,15 +237,14 @@ export default {
             timeout: 10000
           })
           .then(response => {
-            let userData = response;
-            console.log("Image URL: " + userData.data.avatar_url);
-            return userData.data.avatar_url;
+            let image = response.data.avatar_url;
+            this.contributors.push({login, num, image});
           })
           .catch(error => {
             this.display = false;
             alert(error);
           })
-    }
-  }
+    },
+  },
 }
 </script>
