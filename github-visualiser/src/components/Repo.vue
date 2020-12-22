@@ -18,12 +18,17 @@
         <v-row
         >
           <v-col>
-            <h3>Top {{numContributors}} Contributors:</h3>
-            <v-card v-for="(user, index) in contributors" :key="user">
-              <p> {{user}}  {{index + 1}}</p>
+            <h3>Top {{ numContributors }} Contributors:</h3>
+            <v-card v-for="(user, index) in contributors" :key="user"
+                    elevation="2"
+                    style="padding: 1rem; margin: 0.5rem">
+              <div style="display: flex; flex-direction: row; align-items: center">
+                <h4 style="margin: 0">{{index + 1}}</h4>
+                <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.image />
+                <p style="margin: 0"><strong>{{user.login}}:</strong> {{user.num}} contributions</p>
+              </div>
             </v-card>
           </v-col>
-          <p>{{contributors}}</p>
         </v-row>
         <v-row
 
@@ -112,6 +117,7 @@ export default {
             let urlToQuery = this.repoData.commits_url.substring(0, this.repoData.commits_url.length - 6);
             this.cancel = false;
             this.getNextPageOfCommits(urlToQuery, 1, 100);
+            setTimeout('this.contributors.sort((a, b) => (a.num > b.num) ? 1 : ((b. num > a.num) ? -1 : 0))', 1000);
           })
           .catch(error => {
             this.display = false;
@@ -216,7 +222,7 @@ export default {
             let contribs = response.data;
             console.log(contribs);
             this.contributors = [];
-            for(let i = 0; i < contribs.length && i < 10; i++) {
+            for (let i = 0; i < contribs.length && i < 10; i++) {
               let x = contribs[i];
               this.getUserImage(x.url, x.login, x.contributions);
               this.numContributors = i + 1;
