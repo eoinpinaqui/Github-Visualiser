@@ -18,19 +18,28 @@
         <v-row
         >
           <v-col>
-            <h3>Top {{ numContributors }} Contributors:</h3>
+            <h3>Top {{ numContributors }} Contributors (commits):</h3>
             <v-card v-for="(user, index) in contributors" :key="user"
                     elevation="2"
                     style="padding: 1rem; margin: 0.5rem">
               <div style="display: flex; flex-direction: row; align-items: center">
-                <h4 style="margin: 0">{{index + 1}}</h4>
+                <h4 style="margin: 0">{{index + 1}}.</h4>
                 <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.image />
                 <p style="margin: 0"><strong>{{user.login}}:</strong> {{user.num}} contributions</p>
               </div>
             </v-card>
           </v-col>
           <v-col>
-
+            <h3>Top {{numContributors}} Contributors (additions and deletions):</h3>
+            <v-card v-for="(user, index) in additionsDeletions" :key="user"
+                    elevation="2"
+                    style="padding: 1rem; margin: 0.5rem">
+              <div style="display: flex; flex-direction: row; align-items: center">
+                <h4 style="margin: 0">{{index + 1}}.</h4>
+                <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.image />
+                <p style="margin: 0"><strong>{{user.name}}:</strong> {{user.additions}} additions {{user.deletions}} deletions</p>
+              </div>
+            </v-card>
           </v-col>
           <v-col>
 
@@ -72,6 +81,7 @@ export default {
     cancel: false,
     contributors: [],
     numContributors: 0,
+    additionsDeletions : []
   }),
 
   props: {
@@ -101,8 +111,31 @@ export default {
     },
 
     getRepoInfo() {
+      this.getRepoData();
       this.getContributors();
       this.getCommitInfo();
+    },
+
+    getRepoData() {
+      let baseURL = "https://api.github.com";
+      let repo = this.toSearch;
+      const urlToQuery = baseURL + "/repos/" + repo;
+      axios
+          .get(urlToQuery, {
+            headers: {
+              authorization: "token " + this.token
+            },
+            timeout: 10000
+          })
+          .then(response => {
+            let repoData = response.data;
+            this.repoName = repoData.name;
+            this.repoDescription = repoData.description;
+          })
+          .catch(error => {
+            this.display = false;
+            alert(error);
+          })
     },
 
     getCommitInfo() {
@@ -126,6 +159,10 @@ export default {
               let name = x.author.login;
               let weeks = x.weeks;
               let data = {};
+
+              let additions = 0;
+              let deletions = 0;
+
               for(let j = 0; j < weeks.length; j++) {
                 let week = weeks[j];
                 if(week.c > 0) {
@@ -134,9 +171,16 @@ export default {
                   let date = dateFormat.substring(0, 10);
                   data[date] = week.c;
                 }
+                additions += week.a;
+                deletions += week.d;
               }
               this.chartData.push({name, data});
+              let image = x.author.avatar_url;
+              this.additionsDeletions.push({name, additions, deletions, image});
             }
+            setTimeout("this.contributors.sort((a,b) => (a.num > b.num) ? 1: (b.num > a.num) ? -1 : 0)", 2000);
+            this.additionsDeletions.sort((a, b) => (a.additions + a.deletions > b.additions + b.deletions) ? -1 : (b.additions + b.deletions > a.additions + a.deletions) ? 1 : 0);
+            this.additionsDeletions = this.additionsDeletions.slice(0, 5);
           })
           .catch(error => {
             this.display = false;
