@@ -18,7 +18,7 @@
         <v-row
         >
           <v-col>
-            <h3>Top {{ numContributors }} Contributors (commits):</h3>
+            <h3>Top 5 Contributors (commits):</h3>
             <v-card v-on:click="searchUser(user.login)"  v-for="(user, index) in contributors" :key="user"
                     elevation="2"
                     style="padding: 1rem; margin: 0.5rem">
@@ -30,8 +30,8 @@
             </v-card>
           </v-col>
           <v-col>
-            <h3>Top {{numContributors}} Contributors (additions and deletions):</h3>
-            <v-card v-for="(user, index) in additionsDeletions" :key="user"
+            <h3>Top 5 Contributors (additions and deletions):</h3>
+            <v-card v-on:click="searchUser(user.login)" v-for="(user, index) in additionsDeletions" :key="user"
                     elevation="2"
                     style="padding: 1rem; margin: 0.5rem">
               <div style="display: flex; flex-direction: row; align-items: center">
@@ -42,16 +42,16 @@
             </v-card>
           </v-col>
           <v-col>
-            <div style="text-align: center">
-              <div style="display: inline-block; width: 15rem; margin: 0 20px">
-                <h3>Repository languages (in bytes):</h3>
-                <pie-chart :data="languages" :donut="true"></pie-chart>
+            <h3>Top 5 Commenters:</h3>
+            <v-card v-on:click="searchUser(user.login)" v-for="(user, index) in commenters" :key="user"
+                    elevation="2"
+                    style="padding: 1rem; margin: 0.5rem">
+              <div style="display: flex; flex-direction: row; align-items: center">
+                <h4 style="margin: 0">{{index + 1}}.</h4>
+                <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.data.image />
+                <p style="margin: 0"><strong>{{user.login}}:</strong> {{user.data.num}} comments</p>
               </div>
-              <div style="display: inline-block; width: 15rem">
-                <h3>Repository languages (in bytes):</h3>
-                <pie-chart :data="languages" :donut="true"></pie-chart>
-              </div>
-            </div>
+            </v-card>
 
           </v-col>
         </v-row>
@@ -88,9 +88,11 @@ export default {
     chartData: [],
     cancel: false,
     contributors: [],
-    numContributors: 0,
+    allContributors: [],
+    allAdditionsDeletions: [],
     additionsDeletions : [],
-    languages: []
+    commenters: [],
+    allCommenters: [],
   }),
 
   props: {
@@ -123,7 +125,7 @@ export default {
       this.getRepoData();
       this.getContributors();
       this.getCommitInfo();
-      this.getRepoLanguages();
+      this.getComments();
     },
 
     getRepoData() {
@@ -148,10 +150,10 @@ export default {
           })
     },
 
-    getRepoLanguages() {
+    getContributors() {
       let baseURL = "https://api.github.com";
       let repo = this.toSearch;
-      const urlToQuery = baseURL + "/repos/" + repo + "/languages";
+      const urlToQuery = baseURL + "/repos/" + repo + "/contributors";
       axios
           .get(urlToQuery, {
             headers: {
@@ -160,11 +162,16 @@ export default {
             timeout: 10000
           })
           .then(response => {
-            let languagesData = response.data;
-            this.languages = [];
-            for (const [key, value] of Object.entries(languagesData)) {
-              this.languages.push([key, value]);
-           }
+            let contribs = response.data;
+            this.contributors = [];
+            for (let i = 0; i < contribs.length; i++) {
+              let x = contribs[i];
+              let login = x.login;
+              let num = x.contributions
+              let image = x.avatar_url;
+              this.allContributors.push({login, num, image});
+            }
+            this.contributors = this.allContributors.slice(0,5);
           })
           .catch(error => {
             this.display = false;
@@ -210,11 +217,10 @@ export default {
               }
               this.chartData.push({name, data});
               let image = x.author.avatar_url;
-              this.additionsDeletions.push({name, additions, deletions, image});
+              this.allAdditionsDeletions.push({name, additions, deletions, image});
             }
-            this.contributors.sort((a,b) => (a.num > b.num) ? 1: (b.num > a.num) ? -1 : 0);
-            this.additionsDeletions.sort((a, b) => (a.additions + a.deletions > b.additions + b.deletions) ? -1 : (b.additions + b.deletions > a.additions + a.deletions) ? 1 : 0);
-            this.additionsDeletions = this.additionsDeletions.slice(0, 5);
+            this.allAdditionsDeletions.sort((a, b) => (a.additions + a.deletions > b.additions + b.deletions) ? -1 : (b.additions + b.deletions > a.additions + a.deletions) ? 1 : 0);
+            this.additionsDeletions = this.allAdditionsDeletions.slice(0, 5);
           })
           .catch(error => {
             this.display = false;
@@ -222,10 +228,10 @@ export default {
           })
     },
 
-    getContributors() {
+    getComments() {
       let baseURL = "https://api.github.com";
       let repo = this.toSearch;
-      const urlToQuery = baseURL + "/repos/" + repo + "/contributors";
+      const urlToQuery = baseURL + "/repos/" + repo + "/comments";
       axios
           .get(urlToQuery, {
             headers: {
@@ -234,31 +240,26 @@ export default {
             timeout: 10000
           })
           .then(response => {
-            let contribs = response.data;
-            this.contributors = [];
-            for (let i = 0; i < contribs.length && i < 5; i++) {
-              let x = contribs[i];
-              this.getUserImage(x.url, x.login, x.contributions);
-              this.numContributors = i + 1;
+            let comments = response.data;
+            let userComments = new Map();
+            for(let i = 0; i < comments.length; i++) {
+              let comment = comments[i];
+              if(userComments.has(comment.user.login)) {
+                let old = userComments.get(comment.user.login);
+                let num = old.num + 1;
+                let image = old.image;
+                userComments.set(comment.user.login, {num, image});
+              } else {
+                let num = 1;
+                let image = comment.user.avatar_url;
+                userComments.set(comment.user.login, {num, image});
+              }
             }
-          })
-          .catch(error => {
-            this.display = false;
-            alert(error);
-          })
-    },
-
-    getUserImage(urlToQuery, login, num) {
-      axios
-          .get(urlToQuery, {
-            headers: {
-              authorization: "token " + this.token
-            },
-            timeout: 10000
-          })
-          .then(response => {
-            let image = response.data.avatar_url;
-            this.contributors.push({login, num, image});
+            for (const [login, data] of userComments) {
+                this.allCommenters.push({login, data});
+            }
+            this.allCommenters.sort((a, b) => (a.data.num > b.data.num) ? -1 : (b.data.num > a.data.num) ? 1 : 0);
+            this.commenters = this.allCommenters.slice(0, 5);
           })
           .catch(error => {
             this.display = false;
@@ -267,7 +268,6 @@ export default {
     },
 
     searchUser(user) {
-      console.log("It works! " + user);
       this.$emit("searchUser", user);
     },
   },
