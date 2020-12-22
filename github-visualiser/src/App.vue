@@ -34,7 +34,7 @@
 
     <v-main>
       <User v-if="displayUser" :toSearch="search" :token="access_token"/>
-      <Repo v-else-if="displayRepo" :toSearch="search" :token="access_token"/>
+      <Repo v-else-if="displayRepo" :toSearch="search" :token="access_token" v-on:searchUser="changeToUser($event)" />
     </v-main>
   </v-app>
 </template>
@@ -91,6 +91,14 @@ export default {
         this.displayRepo = false;
         this.displayOrg = false;
       }
+    },
+
+    changeToUser(userToSearch) {
+      this.search = userToSearch;
+      this.dropdownSelected = "Users";
+      this.displayUser = true;
+      this.displayRepo = false;
+      this.displayOrg = false;
     }
   }
 };

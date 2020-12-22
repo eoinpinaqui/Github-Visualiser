@@ -19,7 +19,7 @@
         >
           <v-col>
             <h3>Top {{ numContributors }} Contributors (commits):</h3>
-            <v-card v-for="(user, index) in contributors" :key="user"
+            <v-card v-on:click="searchUser(user.login)"  v-for="(user, index) in contributors" :key="user"
                     elevation="2"
                     style="padding: 1rem; margin: 0.5rem">
               <div style="display: flex; flex-direction: row; align-items: center">
@@ -264,6 +264,11 @@ export default {
             this.display = false;
             alert(error);
           })
+    },
+
+    searchUser(user) {
+      console.log("It works! " + user);
+      this.$emit("searchUser", user);
     },
   },
 }
