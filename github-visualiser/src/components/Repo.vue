@@ -16,8 +16,12 @@
         >{{ repoDescription }}
         </v-card-text>
         <v-row
-            align="left"
-            justify="left"
+
+        >
+          <p>{{contributors}}</p>
+        </v-row>
+        <v-row
+
         >
           <h3>Commits by Top 50 Contributors over time:</h3>
           <line-chart :data="chartData"></line-chart>
@@ -47,7 +51,8 @@ export default {
     repoDescription: "",
     commitData: [],
     chartData: [],
-    cancel: false
+    cancel: false,
+    contributors: []
   }),
 
   props: {
@@ -77,6 +82,8 @@ export default {
     },
 
     getRepoInfo() {
+      this.getContributors();
+
       let baseURL = "https://api.github.com";
       let repo = this.toSearch;
       this.commitData = [];
@@ -184,6 +191,55 @@ export default {
         chart.push({name, data})
       }
       this.chartData = chart.slice(0, 50);
+    },
+
+    getContributors() {
+      let baseURL = "https://api.github.com";
+      let repo = this.toSearch;
+      const urlToQuery = baseURL + "/repos/" + repo + "/contributors";
+      axios
+          .get(urlToQuery, {
+            headers: {
+              authorization: "token " + this.token
+            },
+            timeout: 10000
+          })
+          .then(response => {
+            let contribs = response.data;
+            console.log(contribs);
+            this.contributors = [];
+            for(let i = 0; i < contribs.length && i < 10; i++) {
+              let x = contribs[i];
+              let image = this.getUserImage(x.url);
+              console.log("Image to show: " + image);
+              let login = x.login;
+              let num = x.contributions;
+              this.contributors.push({login, num, image});
+            }
+          })
+          .catch(error => {
+            this.display = false;
+            alert(error);
+          })
+    },
+
+    getUserImage(urlToQuery) {
+      axios
+          .get(urlToQuery, {
+            headers: {
+              authorization: "token " + this.token
+            },
+            timeout: 10000
+          })
+          .then(response => {
+            let userData = response;
+            console.log("Image URL: " + userData.data.avatar_url);
+            return userData.data.avatar_url;
+          })
+          .catch(error => {
+            this.display = false;
+            alert(error);
+          })
     }
   }
 }
