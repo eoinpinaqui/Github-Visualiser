@@ -42,12 +42,20 @@
             </v-card>
           </v-col>
           <v-col>
+            <div style="text-align: center">
+              <div style="display: inline-block; width: 15rem; margin: 0 20px">
+                <h3>Repository languages (in bytes):</h3>
+                <pie-chart :data="languages" :donut="true"></pie-chart>
+              </div>
+              <div style="display: inline-block; width: 15rem">
+                <h3>Repository languages (in bytes):</h3>
+                <pie-chart :data="languages" :donut="true"></pie-chart>
+              </div>
+            </div>
 
           </v-col>
         </v-row>
-        <v-row
-
-        >
+        <v-row>
           <v-col>
             <h3>Commits by user over time:</h3>
             <line-chart :data="chartData"></line-chart>
@@ -81,7 +89,8 @@ export default {
     cancel: false,
     contributors: [],
     numContributors: 0,
-    additionsDeletions : []
+    additionsDeletions : [],
+    languages: []
   }),
 
   props: {
@@ -114,6 +123,7 @@ export default {
       this.getRepoData();
       this.getContributors();
       this.getCommitInfo();
+      this.getRepoLanguages();
     },
 
     getRepoData() {
@@ -131,6 +141,30 @@ export default {
             let repoData = response.data;
             this.repoName = repoData.name;
             this.repoDescription = repoData.description;
+          })
+          .catch(error => {
+            this.display = false;
+            alert(error);
+          })
+    },
+
+    getRepoLanguages() {
+      let baseURL = "https://api.github.com";
+      let repo = this.toSearch;
+      const urlToQuery = baseURL + "/repos/" + repo + "/languages";
+      axios
+          .get(urlToQuery, {
+            headers: {
+              authorization: "token " + this.token
+            },
+            timeout: 10000
+          })
+          .then(response => {
+            let languagesData = response.data;
+            this.languages = [];
+            for (const [key, value] of Object.entries(languagesData)) {
+              this.languages.push([key, value]);
+           }
           })
           .catch(error => {
             this.display = false;
@@ -178,7 +212,7 @@ export default {
               let image = x.author.avatar_url;
               this.additionsDeletions.push({name, additions, deletions, image});
             }
-            setTimeout("this.contributors.sort((a,b) => (a.num > b.num) ? 1: (b.num > a.num) ? -1 : 0)", 2000);
+            this.contributors.sort((a,b) => (a.num > b.num) ? 1: (b.num > a.num) ? -1 : 0);
             this.additionsDeletions.sort((a, b) => (a.additions + a.deletions > b.additions + b.deletions) ? -1 : (b.additions + b.deletions > a.additions + a.deletions) ? 1 : 0);
             this.additionsDeletions = this.additionsDeletions.slice(0, 5);
           })
