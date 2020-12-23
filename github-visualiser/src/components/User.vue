@@ -73,12 +73,31 @@
               </div>
             </v-col>
           </v-row>
-          <v-row style="margin: 3em">
+          <v-row style="margin: 3em 0 0 0">
             <v-col>
               <div style="text-align: center">
                 <h3>Commits in 2020:</h3>
                 <VueChartHeatmap :entries="contributionsData" :locale="locale" :color-range="colourRange"
                                  :tooltip-enabled="false"></VueChartHeatmap>
+              </div>
+            </v-col>
+          </v-row>
+          <v-row style="margin: 1em">
+            <v-col>
+              <h3 style="text-align: center">Click below to learn more about a repository:</h3>
+              <div style="display: flex; flex-direction: row; align-items: center; flex-wrap: wrap">
+                <v-card v-on:click="searchRepo(repo.full_name)" v-for="repo in repos" :key="repo"
+                        elevation="2"
+                        style="margin: 1rem; text-align:center; width: 30%; min-width: 200px">
+                  <v-card-title
+                      class="justify-center"
+                  >{{ repo.full_name }}
+                  </v-card-title>
+                  <v-card-text
+                      align="center"
+                  >{{ repo.description }}
+                  </v-card-text>
+                </v-card>
               </div>
             </v-col>
           </v-row>
@@ -371,7 +390,11 @@ export default {
           this.contributionsData.push({counting, created_at});
         }
       }
-    }
+    },
+
+    searchRepo(repo) {
+      this.$emit("searchRepo", repo);
+    },
   }
 }
 </script>

@@ -33,7 +33,7 @@
     </v-container>
 
     <v-main>
-      <User v-if="displayUser" :toSearch="search" :token="access_token"/>
+      <User v-if="displayUser" :toSearch="search" :token="access_token" v-on:searchRepo="changeToRepo($event)"/>
       <Repo v-else-if="displayRepo" :toSearch="search" :token="access_token" v-on:searchUser="changeToUser($event)" />
     </v-main>
   </v-app>
@@ -98,6 +98,14 @@ export default {
       this.dropdownSelected = "Users";
       this.displayUser = true;
       this.displayRepo = false;
+      this.displayOrg = false;
+    },
+
+    changeToRepo(repo) {
+      this.search = repo;
+      this.dropdownSelected = "Repositories";
+      this.displayUser = false;
+      this.displayRepo = true;
       this.displayOrg = false;
     }
   }

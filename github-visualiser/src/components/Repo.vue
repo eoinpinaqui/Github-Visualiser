@@ -31,14 +31,13 @@
           </v-col>
           <v-col>
             <h3>Top 5 Contributors (additions and deletions):</h3>
-            <v-card v-on:click="searchUser(user.login)" v-for="(user, index) in additionsDeletions" :key="user"
+            <v-card v-on:click="searchUser(user.name)" v-for="(user, index) in additionsDeletions" :key="user"
                     elevation="2"
                     style="padding: 1rem; margin: 0.5rem">
               <div style="display: flex; flex-direction: row; align-items: center">
                 <h4 style="margin: 0">{{ index + 1 }}.</h4>
                 <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.image />
-                <p style="margin: 0"><strong>{{ user.name }}:</strong> {{ user.additions }} additions
-                  {{ user.deletions }} deletions</p>
+                <p style="margin: 0"><strong>{{ user.name }}:</strong> {{ user.additions }} additions and {{ user.deletions }} deletions</p>
               </div>
             </v-card>
           </v-col>
@@ -53,13 +52,27 @@
                 <p style="margin: 0"><strong>{{ user.login }}:</strong> {{ user.data.num }} comments</p>
               </div>
             </v-card>
-
           </v-col>
         </v-row>
         <v-row>
           <v-col>
             <h3>Commits by user over time:</h3>
             <line-chart :data="chartData"></line-chart>
+          </v-col>
+        </v-row>
+        <v-row style="margin: 1em">
+          <v-col>
+            <h3 style="text-align: center">Click below to learn more about a contributor:</h3>
+            <div style="display: flex; flex-direction: row; align-items: center; flex-wrap: wrap">
+              <v-card v-on:click="searchUser(user.login)" v-for="user in allContributors" :key="user"
+                      elevation="2"
+                      style="padding: 1rem; margin: 0.5rem; width: 19%">
+                <div style="display: flex; flex-direction: row; align-items: center">
+                  <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.image />
+                  <p style="margin: 0"><strong>{{ user.login }}</strong></p>
+                </div>
+              </v-card>
+            </div>
           </v-col>
         </v-row>
       </v-card>
