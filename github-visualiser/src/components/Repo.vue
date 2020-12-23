@@ -19,13 +19,13 @@
         >
           <v-col>
             <h3>Top 5 Contributors (commits):</h3>
-            <v-card v-on:click="searchUser(user.login)"  v-for="(user, index) in contributors" :key="user"
+            <v-card v-on:click="searchUser(user.login)" v-for="(user, index) in contributors" :key="user"
                     elevation="2"
                     style="padding: 1rem; margin: 0.5rem">
               <div style="display: flex; flex-direction: row; align-items: center">
-                <h4 style="margin: 0">{{index + 1}}.</h4>
+                <h4 style="margin: 0">{{ index + 1 }}.</h4>
                 <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.image />
-                <p style="margin: 0"><strong>{{user.login}}:</strong> {{user.num}} contributions</p>
+                <p style="margin: 0"><strong>{{ user.login }}:</strong> {{ user.num }} contributions</p>
               </div>
             </v-card>
           </v-col>
@@ -35,9 +35,10 @@
                     elevation="2"
                     style="padding: 1rem; margin: 0.5rem">
               <div style="display: flex; flex-direction: row; align-items: center">
-                <h4 style="margin: 0">{{index + 1}}.</h4>
+                <h4 style="margin: 0">{{ index + 1 }}.</h4>
                 <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.image />
-                <p style="margin: 0"><strong>{{user.name}}:</strong> {{user.additions}} additions {{user.deletions}} deletions</p>
+                <p style="margin: 0"><strong>{{ user.name }}:</strong> {{ user.additions }} additions
+                  {{ user.deletions }} deletions</p>
               </div>
             </v-card>
           </v-col>
@@ -47,9 +48,9 @@
                     elevation="2"
                     style="padding: 1rem; margin: 0.5rem">
               <div style="display: flex; flex-direction: row; align-items: center">
-                <h4 style="margin: 0">{{index + 1}}.</h4>
+                <h4 style="margin: 0">{{ index + 1 }}.</h4>
                 <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.data.image />
-                <p style="margin: 0"><strong>{{user.login}}:</strong> {{user.data.num}} comments</p>
+                <p style="margin: 0"><strong>{{ user.login }}:</strong> {{ user.data.num }} comments</p>
               </div>
             </v-card>
 
@@ -90,7 +91,7 @@ export default {
     contributors: [],
     allContributors: [],
     allAdditionsDeletions: [],
-    additionsDeletions : [],
+    additionsDeletions: [],
     commenters: [],
     allCommenters: [],
   }),
@@ -106,7 +107,7 @@ export default {
 
   watch: {
     toSearch: function () {
-      this.cancel = true;
+      this.display = true;
       this.search();
     },
     display: function () {
@@ -118,6 +119,17 @@ export default {
 
   methods: {
     search() {
+      this.repoName = "";
+      this.repoDescription = "";
+      this.commitData = [];
+      this.chartData = [];
+      this.cancel = false;
+      this.contributors = [];
+      this.allContributors = [];
+      this.allAdditionsDeletions = [];
+      this.additionsDeletions = [];
+      this.commenters = [];
+      this.allCommenters = [];
       this.getRepoInfo();
     },
 
@@ -171,7 +183,7 @@ export default {
               let image = x.avatar_url;
               this.allContributors.push({login, num, image});
             }
-            this.contributors = this.allContributors.slice(0,5);
+            this.contributors = this.allContributors.slice(0, 5);
           })
           .catch(error => {
             this.display = false;
@@ -195,7 +207,7 @@ export default {
             contributorsInfo.reverse();
 
             this.chartData = [];
-            for(let i = 0; i < contributorsInfo.length; i++) {
+            for (let i = 0; i < contributorsInfo.length; i++) {
               let x = contributorsInfo[i];
               let name = x.author.login;
               let weeks = x.weeks;
@@ -204,9 +216,9 @@ export default {
               let additions = 0;
               let deletions = 0;
 
-              for(let j = 0; j < weeks.length; j++) {
+              for (let j = 0; j < weeks.length; j++) {
                 let week = weeks[j];
-                if(week.c > 0) {
+                if (week.c > 0) {
                   let dateObject = new Date(week.w * 1000);
                   let dateFormat = dateObject.toISOString();
                   let date = dateFormat.substring(0, 10);
@@ -242,9 +254,9 @@ export default {
           .then(response => {
             let comments = response.data;
             let userComments = new Map();
-            for(let i = 0; i < comments.length; i++) {
+            for (let i = 0; i < comments.length; i++) {
               let comment = comments[i];
-              if(userComments.has(comment.user.login)) {
+              if (userComments.has(comment.user.login)) {
                 let old = userComments.get(comment.user.login);
                 let num = old.num + 1;
                 let image = old.image;
@@ -256,7 +268,7 @@ export default {
               }
             }
             for (const [login, data] of userComments) {
-                this.allCommenters.push({login, data});
+              this.allCommenters.push({login, data});
             }
             this.allCommenters.sort((a, b) => (a.data.num > b.data.num) ? -1 : (b.data.num > a.data.num) ? 1 : 0);
             this.commenters = this.allCommenters.slice(0, 5);

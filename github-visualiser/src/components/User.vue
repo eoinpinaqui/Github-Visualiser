@@ -55,22 +55,30 @@
         <v-container>
           <v-row style="margin: 1em">
             <v-col>
-              <h3>Languages in owned repositories (measured in bytes):</h3>
-              <pie-chart :data="languages" :donut="true"></pie-chart>
+              <div style="text-align: center">
+                <h3>Languages in owned repositories (measured in bytes):</h3>
+                <pie-chart :data="languages" :donut="true"></pie-chart>
+              </div>
             </v-col>
-            <v-col>
-              <h3>Commits made in owned repositories:</h3>
-              <pie-chart :data="repoCommits" :donut="true"></pie-chart>
-            </v-col>
-            <v-col>
-              <h3>Recent Commits:</h3>
-              <column-chart :data="recentActivity"></column-chart>
-            </v-col>
-          </v-row>
-          <v-row style="margin: 1em">
             <v-col>
               <div style="text-align: center">
-                <VueChartHeatmap :entries="contributionsData" :locale="locale" :color-range="colourRange" :tooltip-enabled="false"></VueChartHeatmap>
+                <h3>Commits made in owned repositories:</h3>
+                <pie-chart :data="repoCommits" :donut="true"></pie-chart>
+              </div>
+            </v-col>
+            <v-col>
+              <div style="text-align: center">
+                <h3>Recent Commits:</h3>
+                <column-chart :data="recentActivity"></column-chart>
+              </div>
+            </v-col>
+          </v-row>
+          <v-row style="margin: 3em">
+            <v-col>
+              <div style="text-align: center">
+                <h3>Commits in 2020:</h3>
+                <VueChartHeatmap :entries="contributionsData" :locale="locale" :color-range="colourRange"
+                                 :tooltip-enabled="false"></VueChartHeatmap>
               </div>
             </v-col>
           </v-row>
@@ -121,7 +129,7 @@ export default {
       Less: 'Less',
       More: 'More'
     },
-    colourRange: ["#fffafe", "#ff00ef"]
+    colourRange: ["#ffdbdb", "#16f529"]
   }),
 
   props: {
@@ -345,14 +353,18 @@ export default {
             }
           }`
       }
-      const response = await fetch('https://api.github.com/graphql', { method: 'POST', body: JSON.stringify(body), headers: headers })
+      const response = await fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: headers
+      })
       const data = await response.json()
       let contribs = data.data.user.contributionsCollection.contributionCalendar.weeks;
       this.contributionsData = [];
-      for(let i = 0; i < contribs.length; i++) {
+      for (let i = 0; i < contribs.length; i++) {
         let week = contribs[i];
         let days = week.contributionDays;
-        for(let j = 0; j < days.length; j++) {
+        for (let j = 0; j < days.length; j++) {
           let day = days[j];
           let created_at = day.date;
           let counting = day.contributionCount;
