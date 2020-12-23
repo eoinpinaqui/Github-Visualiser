@@ -67,6 +67,13 @@
               <column-chart :data="recentActivity"></column-chart>
             </v-col>
           </v-row>
+          <v-row style="margin: 1em">
+            <v-col>
+              <div style="text-align: center">
+                <VueChartHeatmap :entries="contributionsData" :locale="locale" :color-range="colourRange" :tooltip-enabled="false"></VueChartHeatmap>
+              </div>
+            </v-col>
+          </v-row>
         </v-container>
       </v-card>
     </v-container>
@@ -76,12 +83,14 @@
 <script>
 import axios from "axios";
 import Unknown from "./Unknown";
+import VueChartHeatmap from 'vue-chart-heatmap';
 
 export default {
   name: 'User',
 
   components: {
-    Unknown
+    Unknown,
+    VueChartHeatmap
   },
 
   data: () => ({
@@ -102,6 +111,17 @@ export default {
     languages: [],
     recentActivity: [],
     repoCommits: [],
+    contributionChart: "",
+    contributionsData: [],
+    locale: {
+      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      days: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      No: 'No',
+      on: 'on',
+      Less: 'Less',
+      More: 'More'
+    },
+    colourRange: ["#fffafe", "#ff00ef"]
   }),
 
   props: {
@@ -161,6 +181,7 @@ export default {
       this.bio = this.userData.data.bio;
       this.followers = this.userData.data.followers;
       this.following = this.userData.data.following;
+      this.getContributions();
     },
 
 
@@ -296,6 +317,47 @@ export default {
               this.display = false;
               alert(error);
             })
+      }
+    },
+
+    async getContributions() {
+      const headers = {
+        'Authorization': `bearer ${this.token}`,
+      }
+      const body = {
+        "query": `query {
+            user(login: "${this.username}") {
+              name
+              contributionsCollection {
+                contributionCalendar {
+                  totalContributions
+                  weeks {
+                    contributionDays {
+                      color
+                      contributionCount
+                      date
+                      weekday
+                    }
+                    firstDay
+                  }
+                }
+              }
+            }
+          }`
+      }
+      const response = await fetch('https://api.github.com/graphql', { method: 'POST', body: JSON.stringify(body), headers: headers })
+      const data = await response.json()
+      let contribs = data.data.user.contributionsCollection.contributionCalendar.weeks;
+      this.contributionsData = [];
+      for(let i = 0; i < contribs.length; i++) {
+        let week = contribs[i];
+        let days = week.contributionDays;
+        for(let j = 0; j < days.length; j++) {
+          let day = days[j];
+          let created_at = day.date;
+          let counting = day.contributionCount;
+          this.contributionsData.push({counting, created_at});
+        }
       }
     }
   }
