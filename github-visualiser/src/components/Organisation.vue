@@ -38,7 +38,7 @@
                 </v-icon>
                 Operating since {{ created }}
               </p>
-              <p>
+              <p v-if="location != ''">
                 <v-icon
                     medium
                 >mdi-google-maps
@@ -55,12 +55,29 @@
             </div>
           </v-col>
         </v-row>
+        <v-container style="margin-top: 1em">
+          <v-row
+          >
+            <h3>Top 100 repositories by number of commits:</h3>
+            <v-col>
+              <column-chart :data="repoCommits"></column-chart>
+            </v-col>
+
+          </v-row>
+        </v-container>
+
         <v-row
         >
+
           <v-col>
             <p>{{orgData}}</p>
           </v-col>
-
+          <v-col>
+            <p>{{members}}</p>
+          </v-col>
+          <v-col>
+            <p>{{repoCommits}}</p>
+          </v-col>
         </v-row>
       </v-card>
     </v-container>
@@ -90,6 +107,9 @@ export default {
     numPublicRepos: 0,
     created: "",
     location: "",
+    members: [],
+    repos: [],
+    repoCommits: []
   }),
 
   props: {
@@ -115,7 +135,9 @@ export default {
 
   methods: {
     search() {
+      this.repoCommits = [];
       this.getOrgInfo();
+      this.getOrgMembers(1);
     },
 
     getOrgInfo() {
@@ -138,6 +160,7 @@ export default {
             this.numPublicRepos = this.orgData.public_repos;
             this.formatDate(this.orgData.created_at);
             this.location = this.orgData.location;
+            this.getRepos(this.orgData.repos_url, 1);
           })
           .catch(error => {
             this.display = false;
@@ -196,10 +219,10 @@ export default {
       this.created = dateToShow + " " + year;
     },
 
-    getOrgMembers() {
+    getOrgMembers(page) {
       let baseURL = "https://api.github.com";
       let org = this.toSearch;
-      const urlToQuery = baseURL + "/orgs/" + org + "/members";
+      const urlToQuery = baseURL + "/orgs/" + org + "/members?per_page=100&page=" + page;
       axios
           .get(urlToQuery, {
             headers: {
@@ -208,13 +231,74 @@ export default {
             timeout: 10000
           })
           .then(response => {
-            console.log(response.data);
+            for(let i = 0; i < response.data.length; i++) {
+              this.members.push(response.data[i]);
+            }
+            if(response.data.length === 100) {
+              this.getOrgMembers(page + 1);
+            }
           })
           .catch(error => {
             this.display = false;
             alert(error);
           })
     },
+
+    getRepos(reposURL, page) {
+      let urlToQuery = reposURL + "?per_page=100&page=" + page;
+      axios
+          .get(urlToQuery, {
+            headers: {
+              authorization: "token " + this.token
+            },
+            timeout: 10000
+          })
+          .then(response => {
+
+            for(let i = 0; i < response.data.length; i++) {
+              this.repos.push(response.data[i]);
+            }
+            if(response.data.length === 100) {
+              this.getRepos(reposURL, page + 1);
+            } else {
+              for(let i = 0; i < this.repos.length; i++) {
+                this.getContriubtors(this.repos[i].name, this.repos[i].contributors_url);
+              }
+            }
+          })
+          .catch(error => {
+            this.display = false;
+            alert(error);
+          })
+    },
+
+    getContriubtors(repoName, urlToQuery) {
+      axios
+          .get(urlToQuery, {
+            headers: {
+              authorization: "token " + this.token
+            },
+          })
+          .then(response => {
+            let numCommits = 0;
+            for(let i = 0; i < response.data.length; i++) {
+              numCommits += response.data[i].contributions;
+            }
+
+            if(this.repoCommits.length < 100 || (this.repoCommits[this.repoCommits.length - 1][1] < numCommits)) {
+              this.repoCommits.push([repoName, numCommits]);
+
+              this.repoCommits.sort((a, b) => (a[1] > b[1]) ? -1 : (b[1] > a[1]) ? 1 : 0);
+              this.repoCommits = this.repoCommits.slice(0, 100);
+            }
+
+          })
+          .catch(error => {
+            this.display = false;
+            alert(error);
+          })
+    },
+
 
 
     searchUser(user) {
