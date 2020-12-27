@@ -41,9 +41,9 @@
               <p v-if="location != ''">
                 <v-icon
                     medium
-                >mdi-google-maps
+                >mdi-account-group
                 </v-icon>
-                Based in {{ location }}
+                 {{ members.length }} members
               </p>
               <p>
                 <v-icon
