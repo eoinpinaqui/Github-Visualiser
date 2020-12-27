@@ -58,9 +58,13 @@
         <v-container style="margin-top: 1em">
           <v-row
           >
-            <h3>Top 100 repositories by number of commits:</h3>
             <v-col>
+              <h3>Top {{ repoCommits.length}} repositories by number of commits:</h3>
               <column-chart :data="repoCommits"></column-chart>
+            </v-col>
+            <v-col>
+              <h3>Top {{ userCommits.length}} members by number of commits in all repositories:</h3>
+              <column-chart :data="userCommits"></column-chart>
             </v-col>
 
           </v-row>
@@ -70,10 +74,10 @@
         >
 
           <v-col>
-            <p>{{orgData}}</p>
+            <p>{{members}}</p>
           </v-col>
           <v-col>
-            <p>{{members}}</p>
+            <p>{{userCommits}}</p>
           </v-col>
           <v-col>
             <p>{{repoCommits}}</p>
@@ -99,8 +103,8 @@ export default {
     display: true,
 
     /* Extracted Organisation Information */
-    orgName: "Org Name",
-    orgDescription: "Org Description",
+    orgName: "",
+    orgDescription: "",
     orgData: "",
     avatarURL: "",
     name: "",
@@ -109,7 +113,8 @@ export default {
     location: "",
     members: [],
     repos: [],
-    repoCommits: []
+    repoCommits: [],
+    userCommits: []
   }),
 
   props: {
@@ -135,7 +140,18 @@ export default {
 
   methods: {
     search() {
+      this.orgName = "";
+      this.orgDescription = "";
+      this.orgData = "";
+      this.avatarURL = "";
+      this.name = "";
+      this.numPublicRepos = 0;
+      this.created = "";
+      this.location = "";
+      this.members = [];
+      this.repos = [];
       this.repoCommits = [];
+      this.userCommits = [];
       this.getOrgInfo();
       this.getOrgMembers(1);
     },
@@ -152,6 +168,7 @@ export default {
             timeout: 10000
           })
           .then(response => {
+            this.display = true;
             this.orgData = response.data;
             this.orgName = this.orgData.login;
             this.orgDescription = this.orgData.description;
@@ -164,7 +181,7 @@ export default {
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
 
@@ -240,7 +257,7 @@ export default {
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
 
@@ -268,7 +285,7 @@ export default {
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
 
@@ -283,7 +300,21 @@ export default {
             let numCommits = 0;
             for(let i = 0; i < response.data.length; i++) {
               numCommits += response.data[i].contributions;
+
+              let found = false;
+              for(let j = 0; j < this.userCommits.length; j++) {
+                if(this.userCommits[j][0] === response.data[i].login) {
+                  this.userCommits[j][1] += response.data[i].contributions;
+                  found = true;
+                }
+              }
+              if(!found) {
+                this.userCommits.push([response.data[i].login, response.data[i].contributions]);
+              }
             }
+
+            this.userCommits.sort((a, b) => (a[1] > b[1]) ? -1 : (b[1] > a[1]) ? 1 : 0);
+            this.userCommits = this.userCommits.slice(0, 100);
 
             if(this.repoCommits.length < 100 || (this.repoCommits[this.repoCommits.length - 1][1] < numCommits)) {
               this.repoCommits.push([repoName, numCommits]);
@@ -291,15 +322,12 @@ export default {
               this.repoCommits.sort((a, b) => (a[1] > b[1]) ? -1 : (b[1] > a[1]) ? 1 : 0);
               this.repoCommits = this.repoCommits.slice(0, 100);
             }
-
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
-
-
 
     searchUser(user) {
       this.$emit("searchUser", user);

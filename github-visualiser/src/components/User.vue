@@ -77,10 +77,13 @@
             <v-col>
               <div style="text-align: center">
                 <h3>Commits in 2020:</h3>
-                <VueChartHeatmap :entries="contributionsData" :locale="locale" :color-range="colourRange"
-                                 :tooltip-enabled="false"></VueChartHeatmap>
+                <vue-chart-heatmap :selector="'contributionHeatMap'" :entries="contributionsData" :locale="locale" :color-range="colourRange"
+                                 :tooltip-enabled="true" :tooltip-unit="'commits'"></vue-chart-heatmap>
               </div>
             </v-col>
+          </v-row>
+          <v-row>
+
           </v-row>
           <v-row style="margin: 1em">
             <v-col>
@@ -117,7 +120,7 @@ export default {
 
   components: {
     Unknown,
-    VueChartHeatmap
+    VueChartHeatmap,
   },
 
   data: () => ({
@@ -148,7 +151,7 @@ export default {
       Less: 'Less',
       More: 'More'
     },
-    colourRange: ["#ffdbdb", "#16f529"]
+    colourRange: ["#ededed", "#16f529"]
   }),
 
   props: {
@@ -197,7 +200,7 @@ export default {
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
 
@@ -248,7 +251,7 @@ export default {
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
 
@@ -269,7 +272,7 @@ export default {
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
 
@@ -304,7 +307,7 @@ export default {
             })
             .catch(error => {
               this.display = false;
-              alert(error);
+              console.log(error);
             })
       }
     },
@@ -342,7 +345,7 @@ export default {
             })
             .catch(error => {
               this.display = false;
-              alert(error);
+              console.log(error);
             })
       }
     },
@@ -390,6 +393,7 @@ export default {
           this.contributionsData.push({counting, created_at});
         }
       }
+      console.log(this.contributionsData);
     },
 
     searchRepo(repo) {

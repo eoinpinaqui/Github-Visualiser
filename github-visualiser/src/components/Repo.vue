@@ -171,7 +171,7 @@ export default {
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
 
@@ -200,7 +200,7 @@ export default {
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
 
@@ -249,7 +249,7 @@ export default {
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
 
@@ -288,7 +288,7 @@ export default {
           })
           .catch(error => {
             this.display = false;
-            alert(error);
+            console.log(error);
           })
     },
 
