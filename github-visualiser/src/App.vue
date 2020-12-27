@@ -35,6 +35,7 @@
     <v-main>
       <User v-if="displayUser" :toSearch="search" :token="access_token" v-on:searchRepo="changeToRepo($event)"/>
       <Repo v-else-if="displayRepo" :toSearch="search" :token="access_token" v-on:searchUser="changeToUser($event)" />
+      <Organisation v-else-if="displayOrg" :toSearch="search" :token="access_token"></Organisation>
     </v-main>
   </v-app>
 </template>
@@ -42,13 +43,15 @@
 <script>
 import User from './components/User.vue';
 import Repo from './components/Repo.vue';
+import Organisation from "./components/Organisation.vue";
 
 export default {
   name: 'App',
 
   components: {
     User,
-    Repo
+    Repo,
+    Organisation
   },
 
   data: () => ({
