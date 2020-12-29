@@ -184,6 +184,10 @@ export default {
       this.getContributors();
       this.getCommitInfo();
       this.getComments();
+      let ref = this;
+      setTimeout(function() {
+        ref.calculateHeroRatings();
+      }, 2000);
     },
 
     getRepoData() {
@@ -280,7 +284,6 @@ export default {
             }
             this.allAdditionsDeletions.sort((a, b) => (a.additions + a.deletions > b.additions + b.deletions) ? -1 : (b.additions + b.deletions > a.additions + a.deletions) ? 1 : 0);
             this.additionsDeletions = this.allAdditionsDeletions.slice(0, 5);
-            this.calculateHeroRatings();
           })
           .catch(error => {
             this.display = false;
@@ -328,10 +331,12 @@ export default {
     },
 
     calculateHeroRatings() {
+      console.log(this.allContributors);
+      if(this.allContributors.length === 1) {
+        this.shortHeroRating = [[this.contributors[0].login, 10, this.contributors[0].image]];
+        return;
+      }
 
-      setTimeout(function() {
-
-      }, 2000);
       let commits = this.allContributors;
       let additions = this.allAdditionsDeletions;
       let commenters = this.allCommenters;

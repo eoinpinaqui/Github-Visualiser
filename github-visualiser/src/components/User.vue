@@ -28,27 +28,28 @@
             >
               <h1>{{ fullName }}</h1>
               <p v-if="bio != null">{{ bio }}</p>
-              <p>
+              <p style="display: inline-block; margin-right: 1em">
                 <v-icon
                     medium
                 >mdi-account-group
                 </v-icon>
                 {{ followers }} followers
               </p>
-              <p>
+              <p style="display: inline-block; margin-right: 1em">
                 <v-icon
                     medium
                 >mdi-account-supervisor
                 </v-icon>
                 {{ following }} following
               </p>
-              <p>
+              <p style="display: inline-block; margin-right: 1em">
                 <v-icon
                     medium
                 >mdi-source-repository
                 </v-icon>
                 {{ numRepos }} repositories
               </p>
+              <img :src="statURL" />
             </div>
           </v-col>
         </v-row>
@@ -78,7 +79,7 @@
               <div style="text-align: center">
                 <h3>Commits in 2020:</h3>
                 <vue-chart-heatmap :selector="'contributionHeatMap'" :entries="contributionsData" :locale="locale" :color-range="colourRange"
-                                 :tooltip-enabled="true" :tooltip-unit="'commits'"></vue-chart-heatmap>
+                                 :tooltip-enabled="false"></vue-chart-heatmap>
               </div>
             </v-col>
           </v-row>
@@ -151,7 +152,8 @@ export default {
       Less: 'Less',
       More: 'More'
     },
-    colourRange: ["#ededed", "#16f529"]
+    colourRange: ["#ededed", "#16f529"],
+    statURL: "",
   }),
 
   props: {
@@ -211,6 +213,7 @@ export default {
       this.bio = this.userData.data.bio;
       this.followers = this.userData.data.followers;
       this.following = this.userData.data.following;
+      this.statURL = "https://github-readme-stats.vercel.app/api?username=" + this.username;
       this.getContributions();
     },
 
