@@ -35,7 +35,7 @@
     <v-main>
       <User v-if="displayUser" :toSearch="search" :token="access_token" v-on:searchRepo="changeToRepo($event)"/>
       <Repo v-else-if="displayRepo" :toSearch="search" :token="access_token" v-on:searchUser="changeToUser($event)" />
-      <Organisation v-else-if="displayOrg" :toSearch="search" :token="access_token"></Organisation>
+      <Organisation v-else-if="displayOrg" :toSearch="search" :token="access_token" v-on:searchUser="changeToUser($event)"></Organisation>
     </v-main>
   </v-app>
 </template>

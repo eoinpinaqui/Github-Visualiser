@@ -75,7 +75,7 @@
               <v-card-text
                   align="center"
               >"Hero Rating" is a metric (devised by Eoin Pinaqui for the CSU33012 Software Engineering module) that
-                can be used to rank contributors based on their involvement in the repository.
+                can be used to rank contributors based on their involvement in a repository.
               </v-card-text>
               <v-card v-on:click="searchUser(user[0])" v-for="user in shortHeroRating" :key="user"
                       elevation="2"

@@ -63,24 +63,39 @@
               <column-chart :data="repoCommits"></column-chart>
             </v-col>
             <v-col>
-              <h3>Top {{ userCommits.length}} members by number of commits in all repositories:</h3>
-              <column-chart :data="userCommits"></column-chart>
+              <h3>Top {{ shortUserCommits.length}} members by number of commits in all repositories:</h3>
+              <column-chart :data="shortUserCommits"></column-chart>
             </v-col>
 
           </v-row>
         </v-container>
-
-        <v-row
-        >
-
+        <v-row>
           <v-col>
-            <p>{{members}}</p>
-          </v-col>
-          <v-col>
-            <p>{{userCommits}}</p>
-          </v-col>
-          <v-col>
-            <p>{{repoCommits}}</p>
+            <v-card
+                elevation="2"
+                style="padding: 1rem; margin: 0.5rem"
+            >
+              <v-card-title
+                  class="justify-center"
+                  style="font-size: 2rem; padding-top: 1em"
+              >Organisation Heroes
+              </v-card-title>
+              <v-card-text
+                  align="center"
+              >"Hero Rating" is a metric (devised by Eoin Pinaqui for the CSU33012 Software Engineering module) that
+                can be used to rank organization members based on their involvement in the organizations repositories.
+              </v-card-text>
+              <v-card v-on:click="searchUser(user.login)" v-for="user in heroRatings.slice(0, 4)" :key="user"
+                      elevation="2"
+                      class="justify-center"
+                      style="padding: 1rem; margin: 2em auto; text-align: center; max-width: 500px">
+                <div style="display: flex; flex-direction: row; align-items: center">
+                  <v-icon>mdi-cards-heart</v-icon>
+                  <img style="margin: 0 1em; width: 10em; border-radius: 50%" :src=user.image />
+                  <p style="margin: 0; font-size: 2em"><strong>{{ user.login }}</strong></p>
+                </div>
+              </v-card>
+            </v-card>
           </v-col>
         </v-row>
       </v-card>
@@ -114,7 +129,12 @@ export default {
     members: [],
     repos: [],
     repoCommits: [],
-    userCommits: []
+    userRepos: [],
+    userCommits: [],
+    shortUserRepos: [],
+    shortUserCommits: [],
+    heroRatings: [],
+    shortHeroRatings: [],
   }),
 
   props: {
@@ -152,6 +172,11 @@ export default {
       this.repos = [];
       this.repoCommits = [];
       this.userCommits = [];
+      this.userRepos = [];
+      this.shortUserRepos = [];
+      this.shortUserCommits = [];
+      this.heroRatings = [];
+      this.shortHeroRatings = [];
       this.getOrgInfo();
       this.getOrgMembers(1);
     },
@@ -311,22 +336,54 @@ export default {
               if(!found) {
                 this.userCommits.push([response.data[i].login, response.data[i].contributions]);
               }
+
+              found = false;
+              for(let j = 0; j < this.userRepos.length; j++) {
+                if(this.userRepos[j][0] === response.data[i].login) {
+                  this.userRepos[j][1] += 1;
+                  found = true;
+                }
+              }
+              if(!found) {
+                this.userRepos.push([response.data[i].login, 1, response.data[i].avatar_url]);
+              }
             }
 
             this.userCommits.sort((a, b) => (a[1] > b[1]) ? -1 : (b[1] > a[1]) ? 1 : 0);
-            this.userCommits = this.userCommits.slice(0, 100);
+            this.shortUserCommits = this.userCommits.slice(0, 50);
 
-            if(this.repoCommits.length < 100 || (this.repoCommits[this.repoCommits.length - 1][1] < numCommits)) {
+            this.userRepos.sort((a, b) => (a[1] > b[1]) ? -1 : (b[1] > a[1]) ? 1 : 0);
+            this.shortUserRepos = this.userRepos.slice(0, 50);
+
+            if(this.repoCommits.length < 50 || (this.repoCommits[this.repoCommits.length - 1][1] < numCommits)) {
               this.repoCommits.push([repoName, numCommits]);
 
               this.repoCommits.sort((a, b) => (a[1] > b[1]) ? -1 : (b[1] > a[1]) ? 1 : 0);
-              this.repoCommits = this.repoCommits.slice(0, 100);
+              this.repoCommits = this.repoCommits.slice(0, 50);
             }
+            this.calculateHeroRating();
           })
           .catch(error => {
             this.display = false;
             console.log(error);
           })
+    },
+
+    calculateHeroRating() {
+      this.heroRatings = [];
+      for(let i = 0; i < this.userCommits.length; i++) {
+        for(let j = 0; j < this.userRepos.length; j++) {
+          if(this.userRepos[j][0] === this.userCommits[i][0]) {
+            let login = this.userRepos[j][0];
+            let rating = j + i;
+            let image = this.userRepos[j][2];
+            let score = this.userCommits[i][1] + " " + this.userRepos[j][1];
+            this.heroRatings.push({login, rating, image, score});
+          }
+        }
+      }
+      this.heroRatings.sort((a, b) => (a.rating > b.rating) ? 1 : (b.rating > a.rating) ? -1 : 0);
+      this.shortHeroRatings = this.shortHeroRatings.slice(0, 3);
     },
 
     searchUser(user) {

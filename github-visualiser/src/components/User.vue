@@ -179,6 +179,20 @@ export default {
 
   methods: {
     search() {
+      this.userData = "";
+      this.username = "";
+      this.avatarURL = "";
+      this.fullName= "";
+      this.bio = "";
+      this.followers = "";
+      this.following = "";
+      this.numRepos = "";
+      this.repos = "";
+      this.languages = [];
+      this.recentActivity = [];
+      this.repoCommits = [];
+      this.contributionChart = "";
+      this.contributionsData = [];
       this.getUserData();
       this.getRecentActivity();
     },
