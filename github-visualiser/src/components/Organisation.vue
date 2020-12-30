@@ -98,6 +98,21 @@
             </v-card>
           </v-col>
         </v-row>
+        <v-row style="margin: 1em">
+          <v-col>
+            <h3 style="text-align: center">Click below to learn more about an organisation member:</h3>
+            <div style="display: flex; flex-direction: row; align-items: center; flex-wrap: wrap">
+              <v-card v-on:click="searchUser(user.login)" v-for="user in members" :key="user"
+                      elevation="2"
+                      style="padding: 1rem; margin: 0.5rem; width: 19%; text-align: center">
+                <div style="display: flex; flex-direction: row; align-items: center">
+                  <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.avatar_url />
+                  <p style="margin: 0"><strong>{{ user.login }}</strong></p>
+                </div>
+              </v-card>
+            </div>
+          </v-col>
+        </v-row>
       </v-card>
     </v-container>
   </div>
