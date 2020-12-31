@@ -100,14 +100,16 @@
         </v-row>
         <v-row style="margin: 1em">
           <v-col>
-            <h3 style="text-align: center">Click below to learn more about an organisation member:</h3>
+            <h3 style="text-align: center">Click below to learn more about a member (sorted by hero rating):</h3>
             <div style="display: flex; flex-direction: row; align-items: center; flex-wrap: wrap">
-              <v-card v-on:click="searchUser(user.login)" v-for="user in members" :key="user"
+              <v-card v-on:click="searchUser(user.login)" v-for="(user, index) in heroRatings" :key="user"
                       elevation="2"
                       style="padding: 1rem; margin: 0.5rem; width: 19%; text-align: center">
                 <div style="display: flex; flex-direction: row; align-items: center">
-                  <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.avatar_url />
+                  <h4 style="margin: 0">{{ index + 1 }}.</h4>
+                  <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.image />
                   <p style="margin: 0"><strong>{{ user.login }}</strong></p>
+
                 </div>
               </v-card>
             </div>
@@ -330,6 +332,10 @@ export default {
     },
 
     getContriubtors(repoName, urlToQuery) {
+      let memberSet = new Set();
+      for(let i = 0; i < this.members.length; i++) {
+        memberSet.add(this.members[i].login);
+      }
       axios
           .get(urlToQuery, {
             headers: {
@@ -348,7 +354,7 @@ export default {
                   found = true;
                 }
               }
-              if(!found) {
+              if(!found && memberSet.has(response.data[i].login)) {
                 this.userCommits.push([response.data[i].login, response.data[i].contributions]);
               }
 
@@ -359,11 +365,10 @@ export default {
                   found = true;
                 }
               }
-              if(!found) {
+              if(!found && memberSet.has(response.data[i].login)) {
                 this.userRepos.push([response.data[i].login, 1, response.data[i].avatar_url]);
               }
             }
-
             this.userCommits.sort((a, b) => (a[1] > b[1]) ? -1 : (b[1] > a[1]) ? 1 : 0);
             this.shortUserCommits = this.userCommits.slice(0, 50);
 

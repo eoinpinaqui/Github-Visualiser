@@ -62,7 +62,7 @@ Here are the graphs that appear in the user section, as well as an example of wh
 ![User Example](img/user-example.gif)
 
 ### The Repositories Section - Graph, Lists and Example
-Here is the graph that appears in the repositories section, as well as an example of what the full repository section looks like:
+Here are the graphs and lists that appear in the repositories section, as well as an example of what the full repository section looks like:
 #### A line graph that shows commits by contributors over time:  
 ![Commits Over Time](img/repo-over-time.PNG)  
 #### A list of the top 5 contributors determined by commits:  
