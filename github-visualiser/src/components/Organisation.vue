@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Unknown v-if="!display" :search="toSearch" category="Repositories"></Unknown>
+    <Unknown v-if="!display" :search="toSearch" category="Organisations"></Unknown>
     <v-container v-else>
       <v-card
           elevation="2"

@@ -209,8 +209,11 @@ export default {
             timeout: 10000
           })
           .then(response => {
-            this.display = true;
+            this.display = false;
             this.userData = response;
+            if(this.userData.data.type === "User") {
+              this.display = true;
+            }
             this.extractUserInfo();
             this.getRepoData();
           })
@@ -410,7 +413,6 @@ export default {
           this.contributionsData.push({counting, created_at});
         }
       }
-      console.log(this.contributionsData);
     },
 
     searchRepo(repo) {
