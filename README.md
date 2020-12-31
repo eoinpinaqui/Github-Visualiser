@@ -5,7 +5,9 @@
 1. [Prerequisites](#prerequisites)
 2. [Running the Project](#running-the-project)
 3. [Project Explanation](#explanation)
-4. [Project Breakdown](#project-breakdown)
+4. [Project Breakdown](#project-breakdown)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a. [Search Fucntionality](#the-search-functionality)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. [User Section](#the-user-section---graphs-and-examples)
 
 ## Prerequisites
 To run this project, you will need the following installed:
@@ -40,9 +42,7 @@ individual software engineers within these contexts.
 The search bar appears at the top of the application and allows users to search github accounts, repositories and organisations.
 ![Search Functionality](img/search.gif)
 
-### The User Section
-The following data is displayed when a successful search is made for a Github user:
-
+### The User Section - Graphs and Examples
 #### A card which evaluates the user's Github performance in the year 2020:  
 ![User Evaluation](img/user-evaluation.PNG)
 #### A pie chart showing what programming languages can be found in the user's owned repositories:  
@@ -55,8 +55,7 @@ The following data is displayed when a successful search is made for a Github us
 ![Commit Heatmap](img/user-heatmap.PNG)
 #### Links to search the user's repositories:  
 ![User Repositoires](img/user-repos.PNG)
-
-Here is an example of a successfully searched user's page:
+#### Here is an example of a successfully searched user's page:
 ![User Example](img/user-example.gif)
 
 
