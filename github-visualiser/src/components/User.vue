@@ -90,18 +90,11 @@
             <v-col>
               <h3 style="text-align: center">Click below to learn more about a repository:</h3>
               <div style="display: flex; flex-direction: row; align-items: center; flex-wrap: wrap">
-                <v-card v-on:click="searchRepo(repo.full_name)" v-for="repo in repos" :key="repo"
+                <div v-on:click="searchRepo(repo.repoName)" v-for="repo in githubReposURLs" :key="repo"
                         elevation="2"
                         style="margin: 1rem; text-align:center; width: 30%; min-width: 200px">
-                  <v-card-title
-                      class="justify-center"
-                  >{{ repo.full_name }}
-                  </v-card-title>
-                  <v-card-text
-                      align="center"
-                  >{{ repo.description }}
-                  </v-card-text>
-                </v-card>
+                  <img :src=repo.imageURL>
+                </div>
               </div>
             </v-col>
           </v-row>
@@ -154,6 +147,7 @@ export default {
     },
     colourRange: ["#ededed", "#16f529"],
     statURL: "",
+    githubReposURLs: ""
   }),
 
   props: {
@@ -193,6 +187,7 @@ export default {
       this.repoCommits = [];
       this.contributionChart = "";
       this.contributionsData = [];
+      this.githubReposURLs = [];
       this.getUserData();
       this.getRecentActivity();
     },
@@ -209,7 +204,6 @@ export default {
             timeout: 10000
           })
           .then(response => {
-            this.display = false;
             this.userData = response;
             if(this.userData.data.type === "User") {
               this.display = true;
@@ -338,6 +332,9 @@ export default {
       let languages = new Map();
       for (let i = 0; i < this.repos.length; i++) {
         const urlToQuery = baseURL + "/repos/" + username + "/" + this.repos[i].name + "/languages";
+        let imageURL = "https://github-readme-stats.vercel.app/api/pin/?username=" + this.username + "&repo=" +this.repos[i].name;
+        let repoName = username + "/" + this.repos[i].name;
+        this.githubReposURLs.push({repoName, imageURL});
         axios
             .get(urlToQuery, {
               headers: {
