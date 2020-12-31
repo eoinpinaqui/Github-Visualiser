@@ -7,7 +7,9 @@
 3. [Project Explanation](#explanation)
 4. [Project Breakdown](#project-breakdown)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a. [Search Fucntionality](#the-search-functionality)  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. [User Section](#the-user-section---graphs-and-examples)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. [User Section](#the-user-section---graphs-and-example)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c. [Repository Section](#the-repositories-section---graph-lists-and-example)
+5. [Hero Rating](#hero-rating)
 
 ## Prerequisites
 To run this project, you will need the following installed:
@@ -42,7 +44,8 @@ individual software engineers within these contexts.
 The search bar appears at the top of the application and allows users to search github accounts, repositories and organisations.
 ![Search Functionality](img/search.gif)
 
-### The User Section - Graphs and Examples
+### The User Section - Graphs and Example
+Here are the graphs that appear in the user section, as well as an example of what the full user section looks like:  
 #### A card which evaluates the user's Github performance in the year 2020:  
 ![User Evaluation](img/user-evaluation.PNG)
 #### A pie chart showing what programming languages can be found in the user's owned repositories:  
@@ -58,8 +61,26 @@ The search bar appears at the top of the application and allows users to search 
 #### Here is an example of a successfully searched user's page:
 ![User Example](img/user-example.gif)
 
+### The Repositories Section - Graph, Lists and Example
+Here is the graph that appears in the repositories section, as well as an example of what the full repository section looks like:
+#### A line graph that shows commits by contributors over time:  
+![Commits Over Time](img/repo-over-time.PNG)  
+#### A list of the top 5 contributors determined by commits:  
+![Top 5 Commits](img/repo-top-five-commits.PNG)
+#### A list of the top 5 contributors determined by additions and deletions:  
+![Top 5 Additions and Deletions](img/repo-top-five-additions.PNG)  
+#### A list of the top 5 commenters:  
+![Top 5 Commenters](img/repo-top-five-commenters.PNG)  
+#### A card showing the three repository heroes (see [Hero Rating](#hero-rating))  
+![Repository Heroes](img/repo-heroes.PNG)  
+#### Links to search contributors:  
+![Repository Contributors](img/repo-contributors.PNG)
+#### Here is an example of a successfully searched repository's page:  
+![Repository Example](img/repo-example.gif)
 
 
+
+## Hero Rating
 
 
 
