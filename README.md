@@ -51,7 +51,7 @@ The following data is displayed when a successful search is made for a Github us
 ![User Commits](img/user-commits.PNG)
 4. A bar chart showing recent user commits.  
 ![Recent Activity](img/user-recent-activity.PNG)
-5. A heat map showing commits over the year 2020.
+5. A heat map showing commits over the year 2020.  
 ![Commit Heatmap](img/user-heatmap.PNG)
 
 Underneath this data there are links to search the user's repositories:  
