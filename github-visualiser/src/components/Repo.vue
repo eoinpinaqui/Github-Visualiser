@@ -92,14 +92,16 @@
         </v-row>
         <v-row style="margin: 1em">
           <v-col>
-            <h3 style="text-align: center">Click below to learn more about a contributor:</h3>
+            <h3 style="text-align: center">Click below to learn more about a contributor (sorted by hero rating):</h3>
             <div style="display: flex; flex-direction: row; align-items: center; flex-wrap: wrap">
-              <v-card v-on:click="searchUser(user.login)" v-for="user in allContributors" :key="user"
+              <v-card v-on:click="searchUser(user[0])" v-for="(user, index) in heroRating" :key="user"
                       elevation="2"
                       style="padding: 1rem; margin: 0.5rem; width: 19%; text-align: center">
                 <div style="display: flex; flex-direction: row; align-items: center">
-                  <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user.image />
-                  <p style="margin: 0"><strong>{{ user.login }}</strong></p>
+                  <h4 style="margin: 0">{{ index + 1 }}.</h4>
+                  <img style="margin: 0 1em;width: 3rem; border-radius: 50%" :src=user[2] />
+                  <p style="margin: 0"><strong>{{ user[0] }}</strong></p>
+
                 </div>
               </v-card>
             </div>
@@ -181,13 +183,13 @@ export default {
 
     getRepoInfo() {
       this.getRepoData();
-      this.getContributors();
+      this.getContributors(1);
       this.getCommitInfo();
       this.getComments();
       let ref = this;
       setTimeout(function() {
         ref.calculateHeroRatings();
-      }, 2000);
+      }, 10000);
     },
 
     getRepoData() {
@@ -212,10 +214,10 @@ export default {
           })
     },
 
-    getContributors() {
+    getContributors(page) {
       let baseURL = "https://api.github.com";
       let repo = this.toSearch;
-      const urlToQuery = baseURL + "/repos/" + repo + "/contributors";
+      const urlToQuery = baseURL + "/repos/" + repo + "/contributors?per_page=100&page=" + page;
       axios
           .get(urlToQuery, {
             headers: {
@@ -233,7 +235,11 @@ export default {
               let image = x.avatar_url;
               this.allContributors.push({login, num, image});
             }
-            this.contributors = this.allContributors.slice(0, 5);
+            if(contribs.length >= 100) {
+              this.getContributors(page + 1);
+            } else {
+              this.contributors = this.allContributors.slice(0, 5);
+            }
           })
           .catch(error => {
             this.display = false;
