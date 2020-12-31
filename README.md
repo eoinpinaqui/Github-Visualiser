@@ -43,18 +43,21 @@ The search bar appears at the top of the application and allows users to search 
 ### The User Section
 The following data is displayed when a successful search is made for a Github user:
 
-#### A card which evaluates the user's Github performance in the year 2020.  
+#### A card which evaluates the user's Github performance in the year 2020:  
 ![User Evaluation](img/user-evaluation.PNG)
-#### A pie chart showing what programming languages can be found in the user's owned repositories.  
+#### A pie chart showing what programming languages can be found in the user's owned repositories:  
 ![Programming Languages](img/user-languages.PNG)
-#### A pie chart showing the amount of commits in the user's owned repositories.  
+#### A pie chart showing the amount of commits in the user's owned repositories:  
 ![User Commits](img/user-commits.PNG)
-#### A bar chart showing recent user commits.  
+#### A bar chart showing recent user commits:  
 ![Recent Activity](img/user-recent-activity.PNG)
-#### A heat map showing commits over the year 2020.  
+#### A heat map showing commits over the year 2020:  
 ![Commit Heatmap](img/user-heatmap.PNG)
-##### Underneath these graphs there are links to search the user's repositories:  
+#### Links to search the user's repositories:  
 ![User Repositoires](img/user-repos.PNG)
+
+Here is an example of a successfully searched user's page:
+![User Example](img/user-example.gif)
 
 
 
