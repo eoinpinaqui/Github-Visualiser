@@ -1,6 +1,10 @@
 # Github-Visualiser
 #### A web-application that interrogates the Github API and visualises data about the software engineering process.
 
+#### Table of Contents
+1. [ Prerequisites ] (#prereq)
+
+<a name="prereq"><a/>
 ### Prerequisites
 To run this project, you will need the following installed:
 
