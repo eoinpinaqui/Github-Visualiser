@@ -1,6 +1,6 @@
 FROM node:lts-alpine
 
-ENV GITHUB_TOKEN=a8a7b1da845f6bc743b3f36d94ff8a754942d451
+ENV GITHUB_TOKEN=<INSERT_YOUR_PERSONAL_ACCESS_TOKEN_HERE>
 
 # install simple http server for serving static content
 RUN npm install -g http-server

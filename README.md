@@ -4,7 +4,7 @@
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
 2. [Running the Project](#running-the-project)
-3. [Project Explanation](#explanation)
+3. [Project Explanation](#project-explanation)
 4. [Project Breakdown](#project-breakdown)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a. [Search Fucntionality](#the-search-functionality)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. [User Section](#the-user-section---graphs-and-example)  
@@ -19,8 +19,11 @@ To run this project, you will need the following installed:
 - Docker
 
 ## Running the Project
-Navigate to the `github-visualiser` folder and run the following terminal commands:
-
+Navigate to the `github-visualiser` folder. In the `Dockerfile`, add your Github Personal Access to the third line, where it says:  
+```
+ENV GITHUB_TOKEN=<INSERT_YOUR_PERSONAL_ACCESS_TOKEN_HERE>
+```
+Now run the following terminal commands:
 ```
 docker build -t <your_image_name> .
 docker run -it -p 8080:8080 --rm <your_image_name>
