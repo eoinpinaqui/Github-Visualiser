@@ -1,6 +1,6 @@
 FROM node:lts-alpine
 
-ENV GITHUB_TOKEN=<INSERT_YOUR_PERSONAL_ACCESS_TOKEN_HERE>
+ENV VUE_APP_API_KEY <INSERT_YOUR_PERSONAL_ACCESS_TOKEN_HERE>
 
 # install simple http server for serving static content
 RUN npm install -g http-server
