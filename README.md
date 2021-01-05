@@ -21,7 +21,7 @@ To run this project, you will need the following installed:
 ## Running the Project
 Navigate to the `github-visualiser` folder. In the `Dockerfile`, add your Github Personal Access to the third line, where it says:  
 ```
-ENV GITHUB_TOKEN=<INSERT_YOUR_PERSONAL_ACCESS_TOKEN_HERE>
+ENV VUE_APP_API_KEY <INSERT_YOUR_PERSONAL_ACCESS_TOKEN_HERE>
 ```
 Now run the following terminal commands:
 ```
