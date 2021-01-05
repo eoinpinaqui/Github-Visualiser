@@ -6,7 +6,7 @@
 2. [Running the Project](#running-the-project)
 3. [Project Explanation](#project-explanation)
 4. [Project Breakdown](#project-breakdown)  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a. [Search Fucntionality](#the-search-functionality)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a. [Search Functionality](#the-search-functionality)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. [User Section](#the-user-section---graphs-and-example)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c. [Repository Section](#the-repositories-section---graph-lists-and-example)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c. [Organisation Section](#the-organisatios-section---graphs-list-and-example)
