@@ -14,9 +14,9 @@
 6. [Examples](#examples)
 
 ## Prerequisites
-To run this project, you will need the following installed:
-
+To run this project, you will need the following:
 - Docker
+- A GitHub Personal Access Token
 
 ## Running the Project
 Navigate to the `github-visualiser` folder. In the `Dockerfile`, add your Github Personal Access to the third line, where it says:  
